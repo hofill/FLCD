@@ -1,0 +1,25 @@
+Syntax
+------------
+
+program       = "main() {\n" decllist cmpdstmt "\n}"
+decllist      = declaration ";" decllist
+declaration   = identifier ":" type
+type          = type[arraydecl]
+arraydecl     = "[" integer "]"
+cmpdstmt      = stmtlist
+stmtlist      = stmt ";" stmtlist
+stmt          = simplstmt | structstmt
+simplstmt     = assignstmt | iostmt
+assignstmt    = identifier ":=" expression
+expression    = (expression operations term) | term
+operations    = "+" | "-"
+operations2   = "*" | ":"
+term          = term operations2 factor | factor
+factor        = "(" expression ")" | identifier
+iostmt        = "read" | "write" "(" identifier ")"
+structstmt    = cmpdstmt | ifstmt | whilestmt
+ifstmt        = "if (" condition ")" stmt ["else" stmt]
+whilestmt     = "while (" condition ")" stmt
+condition     = expression relation expression
+relation      = "<" | ">" | "<=" | "==" | ">="
+
