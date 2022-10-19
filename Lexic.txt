@@ -1,0 +1,42 @@
+# Alphabet
+---
+### Letters
+lowercase_letter = "a"..."z" | "_"
+uppercase_letter = "A"..."Z"
+
+### Digits
+decimal_digit    = "0"..."9"
+binary_digit     = "0" | "1"
+hex_digit        = "0"..."9" | "A"..."F" | "a"..."f"
+
+# Lexic
+---
+## Special symbols
+
+### Operators
++ - * / = < <= = >= & && += ++ != == > < ||
+
+### Separators
+( ) [ ] { } ; : , . space
+
+### Reserved Words
+const break default func interface select case go map struct else switch if type continue for import return var
+
+### Identifiers
+identifier       = letter { letter | decimal_digit }
+letter           = lowercase_letter | uppercase_letter
+digit            = decimal_digit
+
+## Constants
+
+### Integer
+integer           = "0" | ("1"..."9") [decimal_digits]
+signedint         = "-"integer
+decimal_digits    = decimal_digit { decimal_digit }
+
+### Character
+char              = 'letter'|'digit'
+
+### String
+string            = "schar{schar}"
+schar             = letter|digit
