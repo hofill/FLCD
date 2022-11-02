@@ -1,9 +1,9 @@
 Syntax
 ------------
 
-program       = "main() {\n" decllist cmpdstmt "\n}"
+program       = "#\n" decllist cmpdstmt "\n#"
 decllist      = declaration ";" decllist
-declaration   = identifier ":" type
+declaration   = identifier type
 type          = type[arraydecl]
 arraydecl     = "[" integer "]"
 cmpdstmt      = stmtlist
