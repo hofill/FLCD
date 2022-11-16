@@ -71,7 +71,6 @@ public class FileScanner {
             }
         }
         return tempTokens;
-//        return Arrays.stream(line.split("\\s|\\(|\\)|:")).toList();
     }
 
     private boolean checkConstant(String token) {

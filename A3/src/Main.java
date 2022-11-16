@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
         FileScanner scanner = new FileScanner();
         try {
-            scanner.scanFile("/Users/nitahoria/workspace/Facultate/FLCD/A3/files/p1err.caca");
+            scanner.scanFile("/Users/nitahoria/workspace/Facultate/FLCD/A3/files/p1.caca");
             if (scanner.getLastError() != ErrorList.NONE) {
                 System.out.println(scanner.getLastError());
                 System.out.println("Line: " + scanner.getErrorLocation().getFirst());

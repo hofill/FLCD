@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PIF {
@@ -13,8 +16,29 @@ public class PIF {
     }
 
     public void printElements() {
-        for (Pair<String, String> a : PIFList) {
-            System.out.println(a.getFirst() + "|" + a.getSecond());
+        createFile();
+        try {
+            FileWriter myWriter = new FileWriter("PIF.txt");
+            for (Pair<String, String> a : PIFList) {
+                myWriter.write(a.getFirst() + "|" + a.getSecond() + "\n");
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createFile() {
+        try {
+            File myObj = new File("PIF.txt");
+            if (myObj.createNewFile()) {
+                System.out.println("File created: " + myObj.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 }
