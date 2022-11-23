@@ -15,6 +15,10 @@ public class FileScanner {
     private ErrorList lastError;
     private int errorLineNumber;
     private String errorToken;
+    private FiniteAutomata intFA;
+    private FiniteAutomata stringFA;
+    private FiniteAutomata identifierFA;
+    final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
 
     public FileScanner() {
         this.lastError = ErrorList.NONE;
@@ -23,6 +27,9 @@ public class FileScanner {
         this.tokens = new ArrayList<>();
         this.errorLineNumber = 0;
         this.errorToken = "";
+        this.intFA = new FiniteAutomata(filesPath + "fa-int.in");
+        this.stringFA = new FiniteAutomata(filesPath + "fa-string.in");
+        this.identifierFA = new FiniteAutomata(filesPath + "fa-identifier.in");
         try {
             File programFile = new File(System.getProperty("user.dir") + "/files/tokens.in");
             Scanner sc = new Scanner(programFile);
@@ -57,9 +64,8 @@ public class FileScanner {
                 if (newToken.length() != 0) {
                     tempTokens.add(newToken);
                 }
-                lastIndex = i+1;
-            }
-            else if (tokens.contains(Character.toString(line.charAt(i)))) {
+                lastIndex = i + 1;
+            } else if (tokens.contains(Character.toString(line.charAt(i)))) {
                 if (lastIndex != i) {
                     String newToken = getTokenBetweenIndexes(lastIndex, i, line).strip();
                     if (newToken.length() != 0) {
@@ -67,24 +73,26 @@ public class FileScanner {
                     }
                 }
                 tempTokens.add(Character.toString(line.charAt(i)));
-                lastIndex = i+1;
+                lastIndex = i + 1;
             }
         }
         return tempTokens;
     }
 
     private boolean checkConstant(String token) {
-        Pattern numberPattern = Pattern.compile("^\\d*$");
-        Matcher numberMatcher = numberPattern.matcher(token);
-        Pattern stringPattern = Pattern.compile("^\".*\"$");
-        Matcher stringMatcher = stringPattern.matcher(token);
-        return numberMatcher.find() || stringMatcher.find();
+//        Pattern numberPattern = Pattern.compile("^\\d*$");
+//        Matcher numberMatcher = numberPattern.matcher(token);
+//        Pattern stringPattern = Pattern.compile("^\".*\"$");
+//        Matcher stringMatcher = stringPattern.matcher(token);
+//        return numberMatcher.find() || stringMatcher.find();
+        return stringFA.isAccepted(token) || intFA.isAccepted(token);
     }
 
     private boolean checkIdentifier(String token) {
-        Pattern identifierPattern = Pattern.compile("^[a-zA-Z]+[0-9]*$");
-        Matcher identifierMatcher = identifierPattern.matcher(token);
-        return identifierMatcher.find();
+//        Pattern identifierPattern = Pattern.compile("^[a-zA-Z]+[0-9]*$");
+//        Matcher identifierMatcher = identifierPattern.matcher(token);
+//        return identifierMatcher.find();
+        return identifierFA.isAccepted(token);
     }
 
     private void getDataFromLine(String line) {

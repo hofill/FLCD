@@ -21,8 +21,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -40,6 +40,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="RecentsManager">
@@ -74,7 +75,9 @@
       <workItem from="1667352924302" duration="5202000" />
       <workItem from="1667497315520" duration="90000" />
       <workItem from="1668564133755" duration="23000" />
-      <workItem from="1668593461049" duration="1018000" />
+      <workItem from="1668593461049" duration="2269000" />
+      <workItem from="1668983834940" duration="132000" />
+      <workItem from="1669164907026" duration="7743000" />
     </task>
     <servers />
   </component>
