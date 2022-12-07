@@ -1,0 +1,8 @@
+N = { S A B }
+E = { ( ) + - int }
+S = S
+P = {
+    S -> A B
+    A -> ( S ) | int B
+}
+

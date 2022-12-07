@@ -2,6 +2,9 @@ public class Main {
 
     public static void main(String[] args) {
         boolean presentFA = true;
+        final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
+
+//        Grammar grammar = new Grammar(filesPath + "g1.txt");
 
         if (presentFA) {
             UI ui = new UI();
@@ -9,10 +12,9 @@ public class Main {
         }
 
         if (!presentFA) {
-            final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
             FileScanner scanner = new FileScanner();
             try {
-                scanner.scanFile(filesPath + "p1err.caca");
+                scanner.scanFile(filesPath + "p1.caca");
                 if (scanner.getLastError() != ErrorList.NONE) {
                     System.out.println(scanner.getLastError());
                     System.out.println("Line: " + scanner.getErrorLocation().getFirst());

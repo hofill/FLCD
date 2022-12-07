@@ -1,13 +1,15 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class UI {
 
-    private FiniteAutomata FA;
+    private Grammar grammar;
     final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
 
     public UI() {
-        this.FA = new FiniteAutomata(filesPath + "fa-int.in");
+        this.grammar = new Grammar(filesPath + "g1.txt");
     }
 
     public void startUI() {
@@ -20,34 +22,40 @@ public class UI {
             myInput.nextLine();
             switch (command) {
                 case 1: {
-                    this.loadNewFA();
-                    System.out.println("Loaded new FA");
+//                    this.loadNewFA
+                    System.out.println("Loaded new Grammar");
                     break;
                 }
                 case 2: {
-                    System.out.println(Arrays.toString(this.FA.states));
+                    System.out.println(this.grammar.getNonTerminals());
                     break;
                 }
                 case 3: {
-                    System.out.println(Arrays.toString(this.FA.inputs));
+                    System.out.println(this.grammar.getTerminals());
                     break;
                 }
                 case 4: {
-                    System.out.println(this.FA.transitions);
+                    System.out.println(this.grammar.getSetOfProductions());
                     break;
                 }
                 case 5: {
-                    System.out.println(this.FA.initialState);
+                    Scanner scanner = new Scanner(System.in);
+                    System.out.println("How many terminals : ");
+                    int n = scanner.nextInt();
+
+                    var array = new HashSet<String>();
+                    for(int i = 0; i < n; ++i){
+                        var terminal = scanner.next();
+                        array.add(terminal);
+                    }
+                    System.out.println(this.grammar.getProductionsForNonTerminal(array));
                     break;
                 }
                 case 6: {
-                    System.out.println(Arrays.toString(this.FA.finalStates));
-                    break;
-                }
-                case 7: {
-                    System.out.print("> ");
-                    var toTest = myInput.nextLine().trim();
-                    System.out.println(this.FA.isAccepted(toTest));
+                    if(this.grammar.checkCFG())
+                        System.out.println("Correct");
+                    else
+                        System.out.println("Incorrect");
                     break;
                 }
                 default: {
@@ -58,21 +66,14 @@ public class UI {
         }
     }
 
-    private void loadNewFA() {
-        Scanner myInput = new Scanner(System.in);
-        var fileName = myInput.nextLine().trim();
-        FA = new FiniteAutomata(filesPath + fileName);
-    }
-
     private void printMenu() {
         System.out.println("""
-                1. Load new file for FA
-                2. Show set of states
-                3. Show the alphabet
-                4. Show the transitions
-                5. Show initial state
-                6. Show final states
-                7. Check if input is accepted
+                1. Load new file for Grammar
+                2. Show set of non terminals
+                3. Show set of terminals
+                4. Show set of productions
+                5. Show productions for a given non terminal
+                6. CFG check
                 """);
     }
 
