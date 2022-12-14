@@ -4,7 +4,11 @@ public class Main {
         boolean presentFA = true;
         final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
 
-//        Grammar grammar = new Grammar(filesPath + "g1.txt");
+        Grammar grammar = new Grammar(filesPath + "g1.txt");
+        Parser parser = new Parser(grammar);
+        System.out.println("---------------");
+        parser.printFirst();
+        System.out.println("---------------");
 
         if (presentFA) {
             UI ui = new UI();
