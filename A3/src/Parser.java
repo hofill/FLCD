@@ -11,19 +11,15 @@ public class Parser {
         this.setFollow = new HashMap<>();
         this.parseTable = new HashMap<>();
 
-        generateFirst();
-        generateFollow();
+        first();
+        follow();
     }
 
-    public void generateFirst() {
-        // Initialize first set
+    public void first() {
         for (String nonTerminal : grammar.N) {
-            // each non-terminal should have a set
             firstSet.put(nonTerminal, new HashSet<>());
-            // get production for each non-terminal
             Set<List<String>> productionForNonTerminal = grammar.getProduction(nonTerminal);
             for (List<String> production : productionForNonTerminal) {
-                // add if epsilon or is terminal
                 if (grammar.E.contains(production.get(0)) || production.get(0).equals("epsilon"))
                     firstSet.get(nonTerminal).add(production.get(0));
             }
@@ -32,7 +28,6 @@ public class Parser {
         var isChanged = true;
         while (isChanged) {
             isChanged = false;
-            // create new column
             HashMap<String, Set<String>> newColumn = new HashMap<>();
 
             for (String nonTerminal : grammar.N) {
@@ -44,15 +39,17 @@ public class Parser {
         }
     }
 
-    public void generateFollow() {
-        for (String nonterminal : grammar.getNonTerminals()) {
+    public void follow() {
+        for (String nonterminal : grammar.N) {
             setFollow.put(nonterminal, new HashSet<>());
         }
+
         setFollow.get(grammar.S).add("epsilon");
 
-        boolean ok = true;
-        while (ok) {
-            ok = false;
+        boolean ok = false;
+        while (!ok) {
+            ok = true;
+
             HashMap<String, Set<String>> newColumn = new HashMap<>();
 
             for (String nonterminal : grammar.getNonTerminals()) {
@@ -61,51 +58,51 @@ public class Parser {
                 newColumn.put(nonterminal, new HashSet<>());
                 Map<String, Set<List<String>>> nonTerminalProductions = new HashMap<String, Set<List<String>>>();
 
-                allProductions.forEach((key, value) -> {
-                    for (var eachProduction : value) {
-                        if (eachProduction.contains(nonterminal)) {
+                for (var key : allProductions.keySet()) {
+                    for (var prod : allProductions.get(key)) {
+                        if (prod.contains(nonterminal)) {
                             String k = key.iterator().next();
                             if (!nonTerminalProductions.containsKey(k))
                                 nonTerminalProductions.put(k, new HashSet<>());
-                            nonTerminalProductions.get(k).add(eachProduction);
+                            nonTerminalProductions.get(k).add(prod);
                         }
                     }
-                });
 
-                Set<String> addingSet = new HashSet<>(setFollow.get(nonterminal));
+                    Set<String> addingSet = new HashSet<>(setFollow.get(nonterminal));
 
-                nonTerminalProductions.forEach((key, value) -> {
-                    for (var production : value) {
-                        for (var i = 0; i < production.size(); ++i) {
-                            if (production.get(i).equals(nonterminal)) {
-                                if (i + 1 == production.size()) {
-                                    addingSet.addAll(setFollow.get(key));
-                                } else {
-                                    String followSymbol = production.get(i + 1);
-                                    if (grammar.E.contains(followSymbol))
-                                        addingSet.add(followSymbol);
-                                    else {
-                                        for (var symbol : firstSet.get(followSymbol)) {
-                                            if (!symbol.equals("epsilon"))
-                                                addingSet.addAll(firstSet.get(followSymbol));
-                                            else
-                                                addingSet.addAll(setFollow.get(key));
 
+                    for (var keyN : nonTerminalProductions.keySet()) {
+                        for (var prod : nonTerminalProductions.get(keyN)) {
+                            for (var i = 0; i < prod.size(); ++i) {
+                                if (prod.get(i).equals(nonterminal)) {
+                                    if (i  == prod.size() - 1) {
+                                        addingSet.addAll(setFollow.get(keyN));
+                                    } else {
+                                        String followSymbol = prod.get(i + 1);
+                                        if (grammar.E.contains(followSymbol))
+                                            addingSet.add(followSymbol);
+                                        else {
+                                            for (var symbol : firstSet.get(followSymbol)) {
+                                                if (!symbol.equals("epsilon"))
+                                                    addingSet.addAll(firstSet.get(followSymbol));
+                                                else
+                                                    addingSet.addAll(setFollow.get(keyN));
+
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                });
-                if (!addingSet.equals(setFollow.get(nonterminal))) {
-                    ok = true;
+                    if (!addingSet.equals(setFollow.get(nonterminal))) {
+                        ok = false;
+                    }
+                    newColumn.put(nonterminal, addingSet);
                 }
-                newColumn.put(nonterminal, addingSet);
+
+                setFollow = newColumn;
             }
-
-            setFollow = newColumn;
-
         }
     }
 
