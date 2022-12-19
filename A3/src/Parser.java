@@ -2,16 +2,23 @@ import java.util.*;
 
 public class Parser {
     private final Grammar grammar;
+    private final HashMap<Pair<String, String>, Pair<String, Integer>> parseTable;
     private HashMap<String, Set<String>> firstMap;
     private HashMap<String, Set<String>> followMap;
+    private List<List<String>> productions;
 
     public Parser(Grammar grammar) {
         this.grammar = grammar;
         this.firstMap = new HashMap<>();
         this.followMap = new HashMap<>();
+        this.parseTable = new HashMap<>();
+        this.productions = new ArrayList<>();
 
         first();
         follow();
+
+        initializeParseTable();
+        this.generateParseTable();
     }
 
     public void first() {
@@ -19,7 +26,7 @@ public class Parser {
             firstMap.put(nonTerminal, new HashSet<>());
             Set<List<String>> productionForNonTerminal = grammar.getProduction(nonTerminal);
             for (List<String> production : productionForNonTerminal) {
-                if (grammar.E.contains(production.get(0)) || production.get(0).equals("epsilon"))
+                if (grammar.isTerminal(production.get(0)) || production.get(0).equals("epsilon"))
                     firstMap.get(nonTerminal).add(production.get(0));
             }
         }
@@ -36,7 +43,7 @@ public class Parser {
                     List<String> rhsNonTerminals = new ArrayList<>();
                     String rhsTerminal = null;
                     for (String symbol : production)
-                        if (this.grammar.N.contains(symbol))
+                        if (this.grammar.isNonTerminal(symbol))
                             rhsNonTerminals.add(symbol);
                         else {
                             rhsTerminal = symbol;
@@ -112,7 +119,7 @@ public class Parser {
                 column.put(nonterminal, new HashSet<>());
                 Map<String, Set<List<String>>> productionsWithNonterminalInRhs = new HashMap<>();
                 Map<Set<String>, Set<List<String>>> allProductions = grammar.P;
-                for(var key : allProductions.keySet()){
+                for (var key : allProductions.keySet()) {
                     for (var eachProduction : allProductions.get(key)) {
                         if (eachProduction.contains(nonterminal)) {
                             String entry = key.iterator().next();
@@ -125,7 +132,7 @@ public class Parser {
 
                 Set<String> toAdd = new HashSet<>(followMap.get(nonterminal));
 
-                for(var key : productionsWithNonterminalInRhs.keySet()){
+                for (var key : productionsWithNonterminalInRhs.keySet()) {
                     for (var production : productionsWithNonterminalInRhs.get(key)) {
                         for (var indexOfNonterminal = 0; indexOfNonterminal < production.size(); ++indexOfNonterminal)
                             if (production.get(indexOfNonterminal).equals(nonterminal)) {
@@ -133,7 +140,7 @@ public class Parser {
                                     toAdd.addAll(followMap.get(key));
                                 } else {
                                     String followSymbol = production.get(indexOfNonterminal + 1);
-                                    if (grammar.E.contains(followSymbol))
+                                    if (grammar.isTerminal(followSymbol))
                                         toAdd.add(followSymbol);
                                     else {
                                         for (var symbol : firstMap.get(followSymbol)) {
@@ -158,6 +165,91 @@ public class Parser {
         }
     }
 
+    public void generateParseTable() {
+        this.productions = new ArrayList<>();
+        initializeProductionsOnRightSide();
+
+        for (var key : grammar.P.keySet()) {
+            String entry = key.iterator().next();
+            for (var p : grammar.P.get(key)) {
+                String frst = p.get(0);
+                if (grammar.isTerminal(frst))
+                    if (isErr(entry, frst))
+                        addToParseTable(entry, frst, spacedString(p), productions.indexOf(p) + 1);
+                    else
+                        throw new RuntimeException("parsing was done wrong");
+                else if (grammar.isNonTerminal(frst)) {
+                    if (p.size() == 1)
+                        for (var symbol : firstMap.get(frst))
+                            if (isErr(entry, symbol))
+                                addToParseTable(entry, symbol, spacedString(p), productions.indexOf(p) + 1);
+                            else
+                                throw new RuntimeException("parsing was done wrong");
+                    else {
+                        String next = p.get(1);
+                        Set<String> firstSet = firstMap.get(frst);
+                        int index = 1;
+                        while (grammar.isNonTerminal(next) &&
+                                index < p.size()) {
+                            Set<String> firstNext = firstMap.get(next);
+
+                            if (firstSet.contains("epsilon")) {
+                                firstSet.remove("epsilon");
+                                firstSet.addAll(firstNext);
+                            }
+                            index++;
+                            if (index < p.size())
+                                next = p.get(index);
+                        }
+
+                        for (var symbol : firstSet) {
+                            if (symbol.equals("epsilon"))
+                                symbol = "$";
+                            if (isErr(entry, symbol))
+                                addToParseTable(entry, symbol, spacedString(p), productions.indexOf(p) + 1);
+                            else
+                                throw new RuntimeException("parsing was done wrong");
+                        }
+                    }
+                } else {
+                    Set<String> follow = followMap.get(entry);
+                    for (var symbol : follow) {
+                        if (symbol.equals("epsilon")) {
+                            if (isErr(entry, "$")) {
+                                var prod = new ArrayList<>(List.of("epsilon", key));
+                                addToParseTable(entry, "$", "epsilon", productions.indexOf(prod) + 1);
+                            } else
+                                throw new RuntimeException("parsing was done wrong");
+                        } else if (isErr(entry, symbol)) {
+                            var prod = new ArrayList<>(List.of("epsilon", entry));
+                            addToParseTable(entry, symbol, "epsilon", productions.indexOf(prod) + 1);
+                        } else
+                            throw new RuntimeException("parsing was done wrong");
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void initializeProductionsOnRightSide() {
+        for (var key : grammar.P.keySet()) {
+            String nont = key.iterator().next();
+            for (var p : grammar.P.get(key))
+                if (p.get(0).equals("epsilon"))
+                    productions.add(new ArrayList<>(List.of("epsilon", nont)));
+                else
+                    productions.add(p);
+        }
+    }
+
+    public void printParseTable() {
+        StringBuilder builder = new StringBuilder();
+        parseTable.forEach((k, v) -> {
+            builder.append(k).append(" -> ").append(v).append("\n");
+        });
+        System.out.println(builder);
+    }
 
     public void printFollow() {
         StringBuilder builder = new StringBuilder();
@@ -173,6 +265,35 @@ public class Parser {
             builder.append(k).append("-> ").append(v).append("\n");
         });
         System.out.println(builder);
+    }
+
+    private void initializeParseTable() {
+        List<String> rows = new ArrayList<>(grammar.N);
+        rows.addAll(grammar.E);
+        rows.add("$");
+
+        List<String> columns = new ArrayList<>(grammar.E);
+        columns.add("$");
+
+        for (var row : rows)
+            for (var col : columns) {
+                addToParseTable(row, col, "err", -1);
+                addToParseTable(col, col, "pop", -1);
+            }
+
+        addToParseTable("$", "$", "acc", -1);
+    }
+
+    private boolean isErr(String key, String value) {
+        return parseTable.get(new Pair<>(key, value)).getFirst().equals("err");
+    }
+
+    private void addToParseTable(String key, String value, String symbol, Integer svalue) {
+        parseTable.put(new Pair<>(key, value), new Pair<>(symbol, svalue));
+    }
+
+    private String spacedString(List<String> p) {
+        return String.join(" ", p);
     }
 
 }

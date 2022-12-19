@@ -62,6 +62,14 @@ public class Grammar {
         System.out.println(P);
     }
 
+    public boolean isTerminal(String symbol){
+        return E.contains(symbol);
+    }
+
+    public boolean isNonTerminal(String symbol){
+        return N.contains(symbol);
+    }
+
     public Set<String> getNonTerminals() {
         return N;
     }
