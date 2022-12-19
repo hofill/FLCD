@@ -159,12 +159,12 @@ public class Parser {
     }
 
 
-    public String printFollow() {
+    public void printFollow() {
         StringBuilder builder = new StringBuilder();
         followMap.forEach((k, v) -> {
             builder.append(k).append("-> ").append(v).append("\n");
         });
-        return builder.toString();
+        System.out.println(builder);
     }
 
     public void printFirst() {
