@@ -101,66 +101,60 @@ public class Parser {
         for (String nonterminal : grammar.N) {
             followMap.put(nonterminal, new HashSet<>());
         }
-
         followMap.get(grammar.S).add("epsilon");
 
-        boolean ok = false;
+        var ok = false;
         while (!ok) {
             ok = true;
+            HashMap<String, Set<String>> column = new HashMap<>();
 
-            HashMap<String, Set<String>> newColumn = new HashMap<>();
-
-            for (String nonterminal : grammar.getNonTerminals()) {
-                Map<Set<String>, Set<List<String>>> allProductions = grammar.getSetOfProductions();
-
-                newColumn.put(nonterminal, new HashSet<>());
-                Map<String, Set<List<String>>> nonTerminalProductions = new HashMap<>();
-
-                for (var key : allProductions.keySet()) {
-                    for (var prod : allProductions.get(key)) {
-                        if (prod.contains(nonterminal)) {
-                            String k = key.iterator().next();
-                            if (!nonTerminalProductions.containsKey(k))
-                                nonTerminalProductions.put(k, new HashSet<>());
-                            nonTerminalProductions.get(k).add(prod);
+            for (String nonterminal : grammar.N) {
+                column.put(nonterminal, new HashSet<>());
+                Map<String, Set<List<String>>> productionsWithNonterminalInRhs = new HashMap<>();
+                Map<Set<String>, Set<List<String>>> allProductions = grammar.P;
+                for(var key : allProductions.keySet()){
+                    for (var eachProduction : allProductions.get(key)) {
+                        if (eachProduction.contains(nonterminal)) {
+                            String entry = key.iterator().next();
+                            if (!productionsWithNonterminalInRhs.containsKey(entry))
+                                productionsWithNonterminalInRhs.put(entry, new HashSet<>());
+                            productionsWithNonterminalInRhs.get(entry).add(eachProduction);
                         }
                     }
+                }
 
-                    Set<String> addingSet = new HashSet<>(followMap.get(nonterminal));
+                Set<String> toAdd = new HashSet<>(followMap.get(nonterminal));
 
-
-                    for (var keyN : nonTerminalProductions.keySet()) {
-                        for (var prod : nonTerminalProductions.get(keyN)) {
-                            for (var i = 0; i < prod.size(); ++i) {
-                                if (prod.get(i).equals(nonterminal)) {
-                                    if (i == prod.size() - 1) {
-                                        addingSet.addAll(followMap.get(keyN));
-                                    } else {
-                                        String followSymbol = prod.get(i + 1);
-                                        if (grammar.E.contains(followSymbol))
-                                            addingSet.add(followSymbol);
-                                        else {
-                                            for (var symbol : firstMap.get(followSymbol)) {
-                                                if (!symbol.equals("epsilon"))
-                                                    addingSet.addAll(firstMap.get(followSymbol));
-                                                else
-                                                    addingSet.addAll(followMap.get(keyN));
-
-                                            }
+                for(var key : productionsWithNonterminalInRhs.keySet()){
+                    for (var production : productionsWithNonterminalInRhs.get(key)) {
+                        for (var indexOfNonterminal = 0; indexOfNonterminal < production.size(); ++indexOfNonterminal)
+                            if (production.get(indexOfNonterminal).equals(nonterminal)) {
+                                if (indexOfNonterminal + 1 == production.size()) {
+                                    toAdd.addAll(followMap.get(key));
+                                } else {
+                                    String followSymbol = production.get(indexOfNonterminal + 1);
+                                    if (grammar.E.contains(followSymbol))
+                                        toAdd.add(followSymbol);
+                                    else {
+                                        for (var symbol : firstMap.get(followSymbol)) {
+                                            if (symbol.equals("epsilon"))
+                                                toAdd.addAll(followMap.get(key));
+                                            else
+                                                toAdd.addAll(firstMap.get(followSymbol));
                                         }
                                     }
                                 }
                             }
-                        }
                     }
-                    if (!addingSet.equals(followMap.get(nonterminal))) {
-                        ok = false;
-                    }
-                    newColumn.put(nonterminal, addingSet);
                 }
 
-                followMap = newColumn;
+                if (!toAdd.equals(followMap.get(nonterminal))) {
+                    ok = false;
+                }
+                column.put(nonterminal, toAdd);
             }
+
+            followMap = column;
         }
     }
 
