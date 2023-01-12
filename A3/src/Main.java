@@ -1,11 +1,8 @@
-import java.util.List;
-
 public class Main {
 
     public static void main(String[] args) {
         boolean presentFA = true;
-        final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/FLCD-me/A3/files/";
-        List<String> sequence = List.of("(","int",")","+","int");
+        final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/A3/files/";
 
         Grammar grammar = new Grammar(filesPath + "g1.txt");
         Parser parser = new Parser(grammar);
@@ -15,9 +12,6 @@ public class Main {
         parser.printFollow();
         System.out.println("---------------");
         parser.printParseTable();
-        System.out.println("---------------");
-        ParserOutput output = new ParserOutput(parser, sequence, filesPath + "pout.txt");
-        output.printTree();
         System.out.println("---------------");
 
         if (presentFA) {
