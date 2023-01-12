@@ -296,5 +296,60 @@ public class Parser {
         return String.join(" ", p);
     }
 
+    public List<Integer> parseSequence(List<String> sequence) {
+        Stack<String> alpha = new Stack<>();
+        Stack<String> beta = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+
+        //initialization
+        alpha.push("$");
+        for (var i = sequence.size() - 1; i >= 0; --i)
+            alpha.push(sequence.get(i));
+
+        beta.push("$");
+        beta.push(grammar.S);
+
+        while (!(alpha.peek().equals("$") && beta.peek().equals("$"))) {
+            String alphaPeek = alpha.peek();
+            String betaPeek = beta.peek();
+            Pair<String, String> key = new Pair<>(betaPeek, alphaPeek);
+            Pair<String, Integer> value = parseTable.get(key);
+
+            if (value.getFirst().equals("err")) {
+                System.out.println("Key Syntax Err: " + key);
+                System.out.printf("Alpha: %s\nBeta: %s\n", alpha, beta);
+                result = new ArrayList<>(List.of(-1));
+                return result;
+            }
+
+            if (value.getFirst().equals("pop")) {
+                alpha.pop();
+                beta.pop();
+                continue;
+            }
+
+            beta.pop();
+            if (!value.getFirst().equals("epsilon")) {
+                String[] val = value.getFirst().split(" ");
+                for (int i = 0; i < val.length; i++) {
+                    beta.push(val[val.length - i - 1]);
+                }
+            }
+            result.add(value.getSecond());
+        }
+
+        return result;
+    }
+
+    public List<String> getProductionByOrderNumber(int order) {
+        var production = productions.get(order);
+        if (production.contains("epsilon"))
+            return List.of("epsilon");
+        return production;
+    }
+
+    public Grammar getGrammar() {
+        return grammar;
+    }
 }
 
