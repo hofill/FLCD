@@ -4,7 +4,8 @@ public class Main {
 
     public static void main(String[] args) {
         boolean presentFA = true;
-        final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/FLCD-me/A3/files/";
+        final String filesPath = System.getProperty("user.dir");
+//        final String filesPath = "/Users/nitahoria/workspace/Facultate/FLCD/FLCD-me/A3/files/";
         List<String> sequence = List.of("(","int",")","+","int");
 
         Grammar grammar = new Grammar(filesPath + "g1.txt");
@@ -17,7 +18,7 @@ public class Main {
         parser.printParseTable();
         System.out.println("---------------");
         ParserOutput output = new ParserOutput(parser, sequence, filesPath + "pout.txt");
-        output.printTree();
+        output.printTree(filesPath + "ptreeout.txt");
         System.out.println("---------------");
 
         if (presentFA) {

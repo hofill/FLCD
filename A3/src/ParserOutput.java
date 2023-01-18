@@ -64,7 +64,7 @@ public class ParserOutput {
         }
     }
 
-    public void printTree() {
+    public void printTree(String outputFile) {
         try {
             nodeList.sort(Comparator.comparing(Node::getIndex));
             File file = new File(outputFile);
