@@ -1,0 +1,12 @@
+#
+a int = 1;
+b int = 2;
+c int = 3;
+if (b > a) {
+    a = b;
+}
+if (a > c) {
+    a = c;
+}
+print(a);
+#

@@ -1,0 +1,9 @@
+#
+1a int;
+read(1a);
+if (1a == 5) {
+    print("CORRECT PASSWORD");
+} else if (1a ~ 5){
+    print("INCORRECT PASSWORD");
+}
+#
